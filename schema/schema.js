@@ -172,12 +172,11 @@ const Mutation = new GraphQLObjectType({
             },
             resolve(parent, args) {
                 let achievement = new Achievements({
-                    created: args.created,
                     title: args.title,
-                    entry: args.entry,
-                    userID: args.userID,
+                    description: args.entry,
+                    level: args.level,
                 });
-                return diary.save();
+                return achievement.save();
             }
         },
         
