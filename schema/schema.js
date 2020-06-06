@@ -143,6 +143,43 @@ const Mutation = new GraphQLObjectType({
                 return task.save();
             }
         },
+        addDiary: {
+            type: diaryType,
+            args: {
+                //GraphQLNonNull make these field required
+                created: { type: new GraphQLNonNull (GraphQLInt) },
+                title: { type: new GraphQLNonNull (GraphQLString) }, 
+                entry: { type: new GraphQLNonNull (GraphQLString) },
+                userID: { type: new GraphQLNonNull (GraphQLString) }, 
+            },
+            resolve(parent, args) {
+                let diary = new Diary({
+                    created: args.created,
+                    title: args.title,
+                    entry: args.entry,
+                    userID: args.userID,
+                });
+                return diary.save();
+            }
+        },
+        addAchievement: {
+            type: achievementType,
+            args: {
+                //GraphQLNonNull make these field required
+                title: { type: new GraphQLNonNull (GraphQLString) }, 
+                description: { type: new GraphQLNonNull (GraphQLString) },
+                level: { type: new GraphQLNonNull (GraphQLInt) }, 
+            },
+            resolve(parent, args) {
+                let achievement = new Achievements({
+                    created: args.created,
+                    title: args.title,
+                    entry: args.entry,
+                    userID: args.userID,
+                });
+                return diary.save();
+            }
+        },
         
     }
 });
