@@ -3,6 +3,8 @@ const User = require('../models/userModel');
 const Diary = require('../models/diaryModel');
 const Task = require('../models/taskModel');
 const Achievements = require('../models/achievementsModel');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const { 
     GraphQLObjectType, GraphQLString, 
@@ -21,7 +23,8 @@ const userType = new GraphQLObjectType({
     //found if not wrapped in a function
     fields: () => ({
         id: { type: GraphQLID  },
-        name: { type: GraphQLString }, 
+        username: { type: GraphQLString }, 
+        password: {type: GraphQLString},
         drug: { type: GraphQLInt },
         task: {
             type: new GraphQLList(taskType),
@@ -201,22 +204,38 @@ const Mutation = new GraphQLObjectType({
                 return achievement.save();
             }
         },
+        //TODO: FIX ADD USER
         addUser: {
             type: userType,
             args: {
                 //GraphQLNonNull make these field required
-                name: { type: new GraphQLNonNull (GraphQLString) }, 
+                username: { type: new GraphQLNonNull (GraphQLString) }, 
                 drug: { type: new GraphQLNonNull (GraphQLString) },
             },
             resolve(parent, args) {
                 let user = new User({
-                    name: args.name,
+                    username: args.username,
                     drug: args.drug,
                 });
                 return user.save();
             }
         },
-        
+        signup:{
+            type: userType,
+            args: {
+                username: { type: new GraphQLNonNull (GraphQLString) }, 
+                password: { type: new GraphQLNonNull (GraphQLString) }, 
+            },
+            resolve(parent,args){
+                let hash = bcrypt.genSaltSync(10);
+
+                let user = new User({
+                    username: args.username,
+                    password: bcrypt.hashSync(args.password, hash),
+                });
+                return user.save();
+            }
+        }
     }
 });
 
