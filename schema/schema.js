@@ -24,13 +24,13 @@ const userType = new GraphQLObjectType({
         name: { type: GraphQLString }, 
         drug: { type: GraphQLInt },
         task: {
-            type: new GraphQLList(TaskType),
+            type: new GraphQLList(taskType),
             resolve(parent,args){
                 return parent.taskID.map(e => Task.findById(e));
             }
         },
         achievement: {
-            type: new GraphQLList(AchievementType),
+            type: new GraphQLList(achievementType),
             resolve(parent,args){
                 return parent.achievementID.map(e => achievement.findById(e));
             }
@@ -49,6 +49,7 @@ const taskType = new GraphQLObjectType({
         description: { type: GraphQLString },
         drugs: { type: GraphQLInt }, 
         difficulty: { type: GraphQLInt },
+        level: { type: GraphQLInt},
         items: {
             type: new GraphQLList(GraphQLString)
         },
@@ -56,7 +57,7 @@ const taskType = new GraphQLObjectType({
 });
 
 const achievementType = new GraphQLObjectType({
-    name: 'achievement',
+    name: 'Achievement',
     //We are wrapping fields in the function as we dont want to execute this ultil 
     //everything is inilized. For example below code will throw error AuthorType not 
     //found if not wrapped in a function
@@ -69,7 +70,7 @@ const achievementType = new GraphQLObjectType({
 });
 
 const diaryType = new GraphQLObjectType({
-    name: 'diary',
+    name: 'Diary',
     //We are wrapping fields in the function as we dont want to execute this ultil 
     //everything is inilized. For example below code will throw error AuthorType not 
     //found if not wrapped in a function
@@ -91,30 +92,51 @@ const diaryType = new GraphQLObjectType({
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
-        tasks:{
-            type: new GraphQLList(taskType),
+        task:{
+            type: taskType,
+            args: {
+                id: {type: GraphQLID}
+            },
             resolve(parent, args){
                 return Task.find({});
             }
         },
-        task:{
-            type: taskType,
-            args: {
-                id: { type: GraphQLID}
-            },
-            resolve(parent,args){
-                return Task.findById(args.id);
-            }
-        },
-        drugstasks: {
+        tasks:{
             type: new GraphQLList(taskType),
             args: {
-                drugs: { type: GraphQLInt}
+                title: {type: GraphQLString},
+                description: {type: GraphQLString},
+                drugs: { type: GraphQLInt},
+                difficulty: { type: GraphQLInt},
+                level: { type: GraphQLInt}
             },
             resolve(parent,args){
-                return Task.find({drugs: args.drugs})
+                return Task.find(args);
             }
-        }
+        },
+        diary:{
+            type: new GraphQLList(diaryType),
+            args: {
+                created: {type: GraphQLString},
+                title: {type: GraphQLString},
+                entry: {type: GraphQLString},
+                userID: {type: GraphQLString},
+            },
+            resolve(parent,args){
+                return Diary.find(args);
+            }
+        },
+        achievement:{
+            type: new GraphQLList(achievementType),
+            args: {
+                title: {type: GraphQLString},
+                description: {type: GraphQLString},
+                level: { type: GraphQLInt}
+            },
+            resolve(parent,args){
+                return Achievements.find(args);
+            }
+        },
     }
 });
 
@@ -154,7 +176,7 @@ const Mutation = new GraphQLObjectType({
             },
             resolve(parent, args) {
                 let diary = new Diary({
-                    created: args.created,
+                    created: new Date(args.created),
                     title: args.title,
                     entry: args.entry,
                     userID: args.userID,
@@ -177,6 +199,21 @@ const Mutation = new GraphQLObjectType({
                     level: args.level,
                 });
                 return achievement.save();
+            }
+        },
+        addUser: {
+            type: userType,
+            args: {
+                //GraphQLNonNull make these field required
+                name: { type: new GraphQLNonNull (GraphQLString) }, 
+                drug: { type: new GraphQLNonNull (GraphQLString) },
+            },
+            resolve(parent, args) {
+                let user = new User({
+                    name: args.name,
+                    drug: args.drug,
+                });
+                return user.save();
             }
         },
         
