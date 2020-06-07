@@ -6,6 +6,7 @@ const taskSchema = new Schema({
     description: String,
     drugs: Number,
     difficulty: Number,
+    level: Number,
     items:{
         type: [],
         required: false,
