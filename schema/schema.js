@@ -3,6 +3,8 @@ const User = require('../models/userModel');
 const Diary = require('../models/diaryModel');
 const Task = require('../models/taskModel');
 const Achievements = require('../models/achievementsModel');
+const Psychologist = require('../models/psychologistModel');
+const Emergency = require('../models/emergencyModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
@@ -89,6 +91,34 @@ const diaryType = new GraphQLObjectType({
     })
 });
 
+const psychologistType = new GraphQLObjectType({
+    name: 'Psychologist',
+    //We are wrapping fields in the function as we dont want to execute this ultil 
+    //everything is inilized. For example below code will throw error AuthorType not 
+    //found if not wrapped in a function
+    fields: () => ({
+        id: { type: GraphQLID  },
+        name: { type: GraphQLString }, 
+        specialisation: { type: GraphQLString },
+        street: { type: GraphQLString },
+        number: { type: GraphQLInt },
+        city: { type: GraphQLString },
+        phone: { type: GraphQLInt },
+    })
+});
+
+const emergencyType = new GraphQLObjectType({
+    name: 'Emergency',
+    //We are wrapping fields in the function as we dont want to execute this ultil 
+    //everything is inilized. For example below code will throw error AuthorType not 
+    //found if not wrapped in a function
+    fields: () => ({
+        id: { type: GraphQLID  },
+        name: { type: GraphQLString }, 
+        phone: { type: GraphQLInt },
+    })
+});
+
 //RootQuery describe how users can use the graph and grab data.
 //E.g Root query to get all authors, get all books, get a particular 
 //book or get a particular author.
@@ -138,6 +168,30 @@ const RootQuery = new GraphQLObjectType({
             },
             resolve(parent,args){
                 return Achievements.find(args);
+            }
+        },
+        psychologist:{
+            type: new GraphQLList(psychologistType),
+            args: {
+                name: { type: GraphQLString }, 
+                specialisation: { type: GraphQLString },
+                street: { type: GraphQLString },
+                number: { type: GraphQLInt },
+                city: { type: GraphQLString },
+                phone: { type: GraphQLInt },
+            },
+            resolve(parent,args){
+                return Psychologist.find(args);
+            }
+        },
+        emergency:{
+            type: new GraphQLList(emergencyType),
+            args: {
+                name: { type: GraphQLString }, 
+                phone: { type: GraphQLInt },
+            },
+            resolve(parent,args){
+                return Emergency.find(args);
             }
         },
     }
@@ -210,7 +264,7 @@ const Mutation = new GraphQLObjectType({
             args: {
                 //GraphQLNonNull make these field required
                 username: { type: new GraphQLNonNull (GraphQLString) }, 
-                drug: { type: new GraphQLNonNull (GraphQLString) },
+                drug: { type: new GraphQLNonNull (GraphQLInt) },
             },
             resolve(parent, args) {
                 let user = new User({
@@ -218,6 +272,44 @@ const Mutation = new GraphQLObjectType({
                     drug: args.drug,
                 });
                 return user.save();
+            }
+        },
+        addPsychologist: {
+            type: psychologistType,
+            args: {
+                //GraphQLNonNull make these field required
+                name: { type: new GraphQLNonNull (GraphQLString) }, 
+                specialisation: { type: new GraphQLNonNull (GraphQLString) },
+                street: { type: new GraphQLNonNull (GraphQLString) },
+                number: { type: new GraphQLNonNull (GraphQLInt) },
+                city: { type: new GraphQLNonNull (GraphQLString) },
+                phone: { type: new GraphQLNonNull (GraphQLInt) },
+            },
+            resolve(parent, args) {
+                let psychologist = new Psychologist({
+                    name: args.name,
+                    specialisation: args.specialisation,
+                    street: args.street,
+                    number: args.number,
+                    city: args.city,
+                    phone: args.phone,
+                });
+                return psychologist.save();
+            }
+        },
+        addEmergency: {
+            type: emergencyType,
+            args: {
+                //GraphQLNonNull make these field required
+                name: { type: new GraphQLNonNull (GraphQLString) }, 
+                phone: { type: new GraphQLNonNull (GraphQLInt) },
+            },
+            resolve(parent, args) {
+                let emergency = new Emergency({
+                    name: args.name,
+                    phone: args.phone,
+                });
+                return emergency.save();
             }
         },
         signup:{
