@@ -6,6 +6,7 @@ const diarySchema = new Schema({
     title: String,
     entry: String,
     userID: String,
+    used: Number,
 });
 
 module.exports = mongoose.model('Diary', diarySchema);

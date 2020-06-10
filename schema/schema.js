@@ -43,6 +43,15 @@ const userType = new GraphQLObjectType({
     })
 });
 
+const AuthType = new GraphQLObjectType({
+    name: 'Auth',
+
+    fields: () => ({
+       token: { type: GraphQLString }, 
+       user: {type: userType},
+    })
+});
+
 const taskType = new GraphQLObjectType({
     name: 'Task',
     //We are wrapping fields in the function as we dont want to execute this ultil 
@@ -87,7 +96,8 @@ const diaryType = new GraphQLObjectType({
             resolve(parent,args){
                 return User.findById(parent.userID);
             }
-        }
+        },
+        used: { type: GraphQLInt},
     })
 });
 
@@ -154,6 +164,7 @@ const RootQuery = new GraphQLObjectType({
                 title: {type: GraphQLString},
                 entry: {type: GraphQLString},
                 userID: {type: GraphQLString},
+                used: {type: GraphQLInt},
             },
             resolve(parent,args){
                 return Diary.find(args);
@@ -210,6 +221,7 @@ const Mutation = new GraphQLObjectType({
                 drugs: { type: new GraphQLNonNull (GraphQLInt) }, 
                 difficulty: { type: new GraphQLNonNull (GraphQLInt) },
                 items: {type: new GraphQLList( GraphQLString ) },
+                level: { type: new GraphQLNonNull (GraphQLInt) }
             },
             resolve(parent, args) {
                 let task = new Task({
@@ -218,6 +230,7 @@ const Mutation = new GraphQLObjectType({
                     drugs: args.drugs,
                     difficulty: args.difficulty,
                     items: args.items,
+                    level: args.level,
                 });
                 return task.save();
             }
@@ -230,6 +243,7 @@ const Mutation = new GraphQLObjectType({
                 title: { type: new GraphQLNonNull (GraphQLString) }, 
                 entry: { type: new GraphQLNonNull (GraphQLString) },
                 userID: { type: new GraphQLNonNull (GraphQLString) }, 
+                used: { type: new GraphQLNonNull (GraphQLInt)},
             },
             resolve(parent, args) {
                 let diary = new Diary({
@@ -237,6 +251,7 @@ const Mutation = new GraphQLObjectType({
                     title: args.title,
                     entry: args.entry,
                     userID: args.userID,
+                    used: args.used,
                 });
                 return diary.save();
             }
