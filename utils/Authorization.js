@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/userModel');
 
-const signup = async(username, password) => {
+const signup = async({username, password}) => {
 
     let hash = bcrypt.genSaltSync(10);
 
@@ -17,3 +17,5 @@ const signup = async(username, password) => {
         token,user:result
     }
 }
+
+module.exports = {signup};

@@ -7,6 +7,7 @@ const Psychologist = require('../models/psychologistModel');
 const Emergency = require('../models/emergencyModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const {signup} = require('../utils/Authorization');
 
 const { 
     GraphQLObjectType, GraphQLString, 
@@ -43,7 +44,7 @@ const userType = new GraphQLObjectType({
     })
 });
 
-const AuthType = new GraphQLObjectType({
+const authType = new GraphQLObjectType({
     name: 'Auth',
 
     fields: () => ({
@@ -328,21 +329,16 @@ const Mutation = new GraphQLObjectType({
             }
         },
         signup:{
-            type: userType,
+            type: authType,
             args: {
                 username: { type: new GraphQLNonNull (GraphQLString) }, 
                 password: { type: new GraphQLNonNull (GraphQLString) }, 
+                drug: { type: new GraphQLNonNull (GraphQLString) },
             },
             resolve(parent,args){
-                let hash = bcrypt.genSaltSync(10);
-
-                let user = new User({
-                    username: args.username,
-                    password: bcrypt.hashSync(args.password, hash),
-                });
-                return user.save();
+               return signup(args);
             }
-        }
+        },
     }
 });
 
