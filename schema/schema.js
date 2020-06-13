@@ -142,7 +142,7 @@ const RootQuery = new GraphQLObjectType({
                 id: {type: GraphQLID}
             },
             resolve(parent, args){
-                return Task.find({});
+                return Task.find(args);
             }
         },
         tasks:{
@@ -158,7 +158,7 @@ const RootQuery = new GraphQLObjectType({
                 return Task.find(args);
             }
         },
-        diary:{
+        diaries:{
             type: new GraphQLList(diaryType),
             args: {
                 created: {type: GraphQLString},
@@ -169,6 +169,15 @@ const RootQuery = new GraphQLObjectType({
             },
             resolve(parent,args){
                 return Diary.find(args);
+            }
+        },
+        diary:{
+            type: diaryType,
+            args: {
+                _id: {type: GraphQLID},
+            },
+            resolve(parent,args){
+                return Diary.findOne(args);
             }
         },
         achievement:{
