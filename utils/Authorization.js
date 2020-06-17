@@ -18,4 +18,23 @@ const signup = async({username, password}) => {
     }
 }
 
-module.exports = {signup};
+const login = async({username, password}) => {
+
+    let user = await User.findOne({
+        username
+    });
+
+    const match =  await bcrypt.compare(password, user.password);
+
+    if(match){
+        let token = jwt.sign({userId: user._id},"secret");
+        return {
+            token,user
+        }
+    }
+
+    throw "wrong userinfo";
+
+}
+
+module.exports = {signup,login};

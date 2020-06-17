@@ -7,7 +7,8 @@ const Psychologist = require('../models/psychologistModel');
 const Emergency = require('../models/emergencyModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { signup } = require('../utils/Authorization');
+const { signup,login } = require('../utils/Authorization');
+
 
 const {
     GraphQLObjectType,
@@ -254,19 +255,19 @@ const Mutation = new GraphQLObjectType({
             type: diaryType,
             args: {
                 //GraphQLNonNull make these field required
-                created: { type: new GraphQLNonNull(GraphQLInt) },
+                created: { type: (GraphQLInt) },
                 title: { type: new GraphQLNonNull(GraphQLString) },
                 entry: { type: new GraphQLNonNull(GraphQLString) },
                 userID: { type: new GraphQLNonNull(GraphQLString) },
-                used: { type: new GraphQLNonNull(GraphQLInt) },
+                used: { type: (GraphQLInt) },
             },
             resolve(parent, args) {
                 let diary = new Diary({
-                    created: new Date(args.created),
+                 //   created: new Date(args.created),
                     title: args.title,
                     entry: args.entry,
                     userID: args.userID,
-                    used: args.used,
+                  //  used: args.used,
                 });
                 return diary.save();
             }
@@ -353,6 +354,16 @@ const Mutation = new GraphQLObjectType({
                 return signup(args);
             }
         },
+        login: {
+            type: authType,
+            args: {
+                username: { type: new GraphQLNonNull(GraphQLString) },
+                password: { type: new GraphQLNonNull(GraphQLString) },
+            },
+            resolve(parent, args) {
+                return login(args);
+            }
+        }
     }
 });
 
