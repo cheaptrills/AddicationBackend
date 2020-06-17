@@ -21,10 +21,11 @@ app.use('/graphql', graphqlHTTP({
 app.listen(3001, () => {
     console.log('Listening on port 3001');
 }); 
+const database = process.env.DATABASE || "localhost:27017"; 
 
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017');
+mongoose.connect('mongodb://' + database);
 
 mongoose.connection.once('open', () => {
     console.log('conneted to database');
