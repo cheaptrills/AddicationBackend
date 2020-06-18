@@ -6,7 +6,7 @@ services:
     container_name: proxy
     restart: always
     ports:
-      - 0.0.0.0:80:80
+      - 0.0.0.0:9090:80
     external_links:
       - backend
     volumes:
